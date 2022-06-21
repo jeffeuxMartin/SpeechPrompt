@@ -37,7 +37,7 @@ This is a project under the research topic: **Leveraging Pre-training Models for
 For more information, please refer to our website: https://jsalt-2022-ssl.github.io/
 
 ## Citation
-```
+```bib
 @article{chang2022exploration,
   title={An Exploration of Prompt Tuning on Generative Spoken Language Model for Speech Processing Tasks},
   author={Chang, Kai-Wei and Tseng, Wei-Cheng and Li, Shang-Wen and Lee, Hung-yi},
@@ -45,17 +45,19 @@ For more information, please refer to our website: https://jsalt-2022-ssl.github
   year={2022}
 }
 ```
+
 ## Code Usage
+
 ### 1. Environment
 
 Create Conda virtual environment:
-```
+```bash
 conda env create -f environment.yaml
 conda activate speech_prompt
 ```
 
 Install fairseq with the tested version:
-```
+```bash
 git clone https://github.com/facebookresearch/fairseq.git
 cd faireq/
 git checkout e55e094
@@ -72,16 +74,19 @@ convert downstream tasks' speech and label into units
 3. quantize
 4. postprocessing (add downstream task's label)
 
-```
+```bash
 DOWNSTREAM=DOWNSTREAM_NAME
-python preprocess/runner.py --downstream $DOWNSTREAM --action generate_manifest
-python preprocess/runner.py --downstream $DOWNSTREAM --action quantized
-python preprocess/runner.py --downstream $DOWNSTREAM --action postprocess
+python preprocess/runner.py \
+  --downstream $DOWNSTREAM --action generate_manifest
+python preprocess/runner.py \
+  --downstream $DOWNSTREAM --action quantized
+python preprocess/runner.py \
+  --downstream $DOWNSTREAM --action postprocess
 
 ```
 * Note1: We have prepared some example data in:
-    * SpeechPrompt/preprocess/speech_commands/data
-    * SpeechPrompt/preprocess/fluent_commands/data
+    * `SpeechPrompt/preprocess/speech_commands/data`
+    * `SpeechPrompt/preprocess/fluent_commands/data`
 
     You can directly use them to have a quick start.
 
@@ -101,28 +106,28 @@ Preprocess data into the format that fits fairseq
 
     ("\<s\>"  is the separation token)
     
-    ```
+    ```bash
     python make_data.py
     ```
-    &rarr; generate dataset/data_prompt/
+    &rarr; generate `dataset/data_prompt/`
 
 2. verbalizer
-    ```
+    ```bash
     python gen_labelspace.py 
     ```
-    &rarr; create labelspace.json
+    &rarr; create `labelspace.json`
 
-    ```
+    ```bash
     python verbalizer.py
     ```
 
-    &rarr; create verbal.json ; genearte dataset/data_freq/
+    &rarr; create `verbal.json` ; genearte `dataset/data_freq/`
 
-3. convert the dataset/data_freq/ into binary files:
-    ```
+3. convert the `dataset/data_freq/` into binary files:
+    ```bash
     python preprocess.py
     ```
-    &rarr; genearte data-bins/
+    &rarr; genearte `data-bins/`
 
 
 ### 4. Training
@@ -132,36 +137,39 @@ https://github.com/pytorch/fairseq/tree/main/examples/textless_nlp/gslm/ulm
     
     * In the paper, we used **HuBERT-100** and **CPC-100**
 
-```
+```bash
 python train.py
 
-e.g.
-python train.py --date 20220430 --prompt_task IC --unit_model hubert100 --prefix_prompt_length 6
+# e.g.
+python train.py --date 20220430 \
+  --prompt_task IC \
+  --unit_model hubert100 \
+  --prefix_prompt_length 6
 ```
 
 
 * Important Information:
 2022-04-30 21:32:51 | INFO | fairseq_cli.train | num. shared model params: 151,417,856 **(num. trained: 154,624)**
 
-* Checkpoints will be saved into checkpoints/
-[task]\_[unit_model]\_checkpoints\_[model_serial_number (date)]
+* Checkpoints will be saved into `checkpoints/[task]_[unit_model]_checkpoints_[model_serial_number (date)]`
 
-* Log files will be saved into logs/
-[task]\_[unit_model]\_log\_[model_serial_number (date)]
+* Log files will be saved into `logs/[task]_[unit_model]_log_[model_serial_number (date)]`
 
 ### 5. Inference (sampling)
-```
+```bash
 python sample.py
 
-e.g.
-python sample.py --prompt_task IC --unit_model hubert100 --model_date 20220430 --sample_date 20220430
+# e.g.
+python sample.py \
+  --prompt_task IC \
+  --unit_model hubert100 --model_date 20220430 --sample_date 20220430
 ```
 
 * The output files will be saved into 
-samples / samples\_[sample_date] / samples\_[task]\_[unit_model]\_[model_date].json
+`samples/samples_[sample_date]/samples_[task]_[unit_model]_[model_date].json`
 
 ### 6. Performance Evaluation
-```
+```bash
 python cal_acc.py
 ```
 
